@@ -1,0 +1,14 @@
+{
+  "name": "taskflow",
+  "version": "1.0.0",
+  "description": "TaskFlow student portal with IBM Cloudant storage",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@ibm-cloud/cloudant": "^0.10.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ibm-cloud-sdk-core": "^5.1.0"
+  }
+}

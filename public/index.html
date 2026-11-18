@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TaskFlow | Student Portal</title>
+<meta name="color-scheme" content="light dark">
+<style>
+:root{--bg:#f7f6fc;--card:#fff;--text:#29263b;--muted:#888;--line:#eee;--input:#e4e0ef;--accent:#7964c8;--soft:#f0edfa;--bar:#eee}
+@media(prefers-color-scheme:dark){body:not(.light){--bg:#17151f;--card:#221f2d;--text:#ece9f6;--muted:#9a96ad;--line:#33303f;--input:#3a3648;--soft:#2e2942;--bar:#33303f}body:not(.light) .delete{background:#3a2530}}
+body.dark{--bg:#17151f;--card:#221f2d;--text:#ece9f6;--muted:#9a96ad;--line:#33303f;--input:#3a3648;--soft:#2e2942;--bar:#33303f}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{background:var(--bg)}
+body{background:var(--bg);color:var(--text);transition:background .2s}
+header{background:var(--card);padding:20px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.logo{font-size:26px;font-weight:bold;color:var(--accent)}
+.logo span{color:var(--text)}
+.hright{display:flex;align-items:center;gap:14px}
+header small{color:var(--muted)}
+#themeBtn{border:1px solid var(--input);background:var(--card);border-radius:20px;padding:7px 12px;font-size:14px;color:var(--text)}
+.container{max-width:1150px;margin:35px auto;padding:0 22px}
+.welcome{margin-bottom:28px}
+.welcome h1{font-size:29px;margin-bottom:9px}
+.welcome p{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:17px;margin-bottom:28px}
+.card{background:var(--card);padding:22px;border-radius:14px;box-shadow:0 4px 18px #29263b10}
+.stat h2{font-size:30px;color:var(--accent);margin-bottom:8px}
+.stat p{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.tabs button{border:0;background:var(--card);padding:12px 19px;border-radius:9px;color:var(--muted);cursor:pointer;font-size:14px}
+.tabs button.active,.primary{background:var(--accent);color:#fff}
+.section{display:none}
+.section.active{display:block}
+.section h2{font-size:21px;margin-bottom:20px}
+.form{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+input,select,textarea{padding:12px;border:1px solid var(--input);border-radius:8px;background:var(--card);color:var(--text);min-width:0;flex:1;font-size:14px}
+button{cursor:pointer}
+.primary{border:0;padding:12px 18px;border-radius:8px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:16px;background:var(--card);border-radius:10px;margin-bottom:11px;border:1px solid var(--line)}
+.item p{font-size:13px;color:var(--muted);margin-top:6px}
+.item button{border:0;padding:8px 11px;border-radius:7px;margin-left:4px}
+.edit{background:var(--soft);color:var(--accent)}
+.delete{background:#fff0f3;color:#c45b75}
+body.dark .delete{background:#3a2530}
+.done{text-decoration:line-through;opacity:.5}
+.empty{color:#999;text-align:center;padding:25px}
+.overdue{border-left:4px solid #e05a77}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.b-high{background:#ffe3e8;color:#c0314f}.b-medium{background:#fff1d6;color:#a8700a}.b-low{background:#dff5e6;color:#2a7d4b}.b-over{background:#e05a77;color:#fff}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.filters input{flex:2;min-width:140px}
+.chip{border:1px solid var(--input);background:var(--card);color:var(--muted);padding:9px 14px;border-radius:20px;font-size:13px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.subject{margin-bottom:23px}
+.subject-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.subject-top span{color:var(--accent);font-weight:bold}
+.subject.low .subject-top span{color:#e05a77}
+.bar{height:9px;background:var(--bar);border-radius:10px;overflow:hidden}
+.fill{height:100%;background:#9078d8;border-radius:10px}
+.subject.low .fill{background:#e05a77}
+.warn{color:#e05a77;font-size:12px;margin-top:5px}
+.ok{color:#2a9d63;font-size:12px;margin-top:5px}
+.subject-actions{margin-top:10px}
+.subject-actions button{border:0;padding:7px 12px;border-radius:7px;margin-right:6px}
+textarea{width:100%;min-height:130px;resize:vertical}
+.note{margin-top:12px}
+.summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.summary div{background:var(--soft);padding:12px 16px;border-radius:10px;font-size:13px;color:var(--muted)}
+.summary b{display:block;font-size:20px;color:var(--accent)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.tools button{border:1px solid var(--input);background:var(--card);color:var(--muted);padding:9px 14px;border-radius:8px;font-size:13px}
+footer{text-align:center;padding:30px;color:#999;font-size:12px}
+@media(max-width:700px){
+.stats{grid-template-columns:repeat(2,1fr)}
+header{padding:16px}
+.welcome h1{font-size:23px}
+.form{flex-direction:column}
+.item{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">Task<span>Flow.</span></div>
+ <div class="hright"><small>SVVV · Student Portal</small><button id="themeBtn" onclick="toggleTheme()">🌙</button></div>
+</header>
+
+<div class="container">
+ <div class="welcome">
+  <h1 id="greeting">Welcome back, Student! 👋</h1>
+  <p>Stay organised, stay productive. Your academic life in one place.</p>
+ </div>
+
+ <div class="stats">
+  <div class="card stat"><h2 id="total">0</h2><p>Total Tasks</p></div>
+  <div class="card stat"><h2 id="completed">0</h2><p>Completed Tasks</p></div>
+  <div class="card stat"><h2 id="pending">0</h2><p>Pending Tasks</p></div>
+  <div class="card stat"><h2 id="attendanceStat">0%</h2><p>Overall Attendance</p></div>
+ </div>
+
+ <div class="tabs">
+  <button class="active" onclick="show('dashboard',this)">Dashboard</button>
+  <button onclick="show('tasks',this)">My Tasks</button>
+  <button onclick="show('attendance',this)">Attendance</button>
+  <button onclick="show('marks',this)">Assessments</button>
+  <button onclick="show('notes',this)">My Notes</button>
+ </div>
+
+ <section id="dashboard" class="section active">
+  <div class="card">
+   <h2>📌 Your Productivity Hub</h2>
+   <p style="color:var(--muted);line-height:1.8">Manage assignments, monitor attendance, track academic performance and keep your notes organised — all in one place.</p>
+   <br>
+   <h3 style="margin-bottom:14px">Upcoming Tasks</h3>
+   <div id="upcoming"></div>
+   <br>
+   <h3 style="margin-bottom:14px">Attendance Summary</h3>
+   <div id="dashboardAttendance"></div>
+  </div>
+ </section>
+
+ <section id="tasks" class="section">
+  <div class="card">
+   <h2>My Tasks &amp; Assignments</h2>
+   <div class="form">
+    <input id="taskName" placeholder="Enter task name">
+    <input id="taskDate" type="date">
+    <select id="priority"><option>Medium</option><option>High</option><option>Low</option></select>
+    <button class="primary" onclick="addTask()">+ Add Task</button>
+   </div>
+   <div class="filters">
+    <input id="search" placeholder="🔍 Search tasks" oninput="setSearch(this.value)">
+    <button class="chip on" data-f="all" onclick="setFilter('all',this)">All</button>
+    <button class="chip" data-f="pending" onclick="setFilter('pending',this)">Pending</button>
+    <button class="chip" data-f="done" onclick="setFilter('done',this)">Completed</button>
+   </div>
+   <div id="taskList"></div>
+  </div>
+ </section>
+
+ <section id="attendance" class="section">
+  <div class="card">
+   <h2>Attendance Tracker</h2>
+   <p style="color:var(--muted);margin-bottom:20px">Sample attendance is pre-filled. Subjects below 75% are highlighted.</p>
+   <div class="form">
+    <input id="subjectName" placeholder="Subject name">
+    <input id="attended" type="number" min="0" placeholder="Classes attended">
+    <input id="held" type="number" min="1" placeholder="Total classes">
+    <button class="primary" onclick="addAttendance()">+ Add Subject</button>
+   </div>
+   <div id="attendanceList"></div>
+  </div>
+ </section>
+
+ <section id="marks" class="section">
+  <div class="card">
+   <h2>Assessment Performance</h2>
+   <div class="form">
+    <input id="examName" placeholder="Subject / Assessment">
+    <input id="obtained" type="number" min="0" placeholder="Marks obtained">
+    <input id="maximum" type="number" min="1" placeholder="Maximum marks">
+    <button class="primary" onclick="addMark()">+ Add Marks</button>
+   </div>
+   <div id="marksSummary" class="summary"></div>
+   <div id="marksList"></div>
+  </div>
+ </section>
+
+ <section id="notes" class="section">
+  <div class="card">
+   <h2>Personal Notes</h2>
+   <textarea id="noteText" placeholder="Write your notes, reminders or important points..."></textarea>
+   <button class="primary note" onclick="saveNote()">Save Note</button>
+   <div id="notesList" style="margin-top:20px"></div>
+  </div>
+ </section>
+
+ <div class="tools">
+  <button onclick="resetData()">🗑 Reset all data</button>
+ </div>
+</div>
+
+<footer>TaskFlow © 2026 · Shri Vaishnav Vidhyapeeth Vishwavidyalaya</footer>
+
+<script>
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}}
+function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+let tasks=[],attendance=null,marks=[],notes=[];
+let filter="all",query="";
+
+if(!attendance||attendance.length===0){
+ attendance=[
+  {name:"Data Structures",a:32,h:40},
+  {name:"Software Engineering",a:28,h:35},
+  {name:"Operating Systems",a:30,h:36},
+  {name:"Computer Networks",a:25,h:32}
+ ];
+}
+
+// SAVE TO SERVER (IBM Cloudant via Node proxy), batched
+let timer;
+function save(){
+ clearTimeout(timer);
+ timer=setTimeout(()=>fetch("/api/data",{
+  method:"PUT",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({tasks,attendance,marks,notes})
+ }).catch(()=>{}),400);
+}
+
+// LOAD FROM SERVER
+async function pull(){
+ try{
+  const d=await (await fetch("/api/data")).json();
+  tasks=d.tasks||[];
+  marks=d.marks||[];
+  notes=d.notes||[];
+  if(d.attendance&&d.attendance.length) attendance=d.attendance;
+ }catch(e){}
+ render();
+}
+
+// THEME + GREETING
+let theme=load("theme",null);
+function isDark(){return theme?theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches}
+function applyTheme(){
+ const d=isDark();
+ document.body.classList.toggle("dark",d);
+ document.body.classList.toggle("light",!d);
+ document.getElementById("themeBtn").textContent=d?"☀️":"🌙";
+}
+function toggleTheme(){
+ theme=isDark()?"light":"dark";
+ put("theme",JSON.stringify(theme));
+ applyTheme();
+}
+(function(){
+ const h=new Date().getHours();
+ const g=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+ document.getElementById("greeting").textContent=g+", Student! 👋";
+})();
+
+function show(id,btn){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ btn.classList.add("active");
+}
+
+// TASKS
+function addTask(){
+ const name=document.getElementById("taskName").value.trim();
+ const date=document.getElementById("taskDate").value;
+ const priority=document.getElementById("priority").value;
+ if(!name){alert("Please enter a task name");return}
+ tasks.push({name,date,priority,done:false});
+ document.getElementById("taskName").value="";
+ document.getElementById("taskDate").value="";
+ save();render();
+}
+function toggleTask(i){tasks[i].done=!tasks[i].done;save();render()}
+function deleteTask(i){tasks.splice(i,1);save();render()}
+function editTask(i){
+ const n=prompt("Edit task name:",tasks[i].name);
+ if(n===null)return;
+ if(!n.trim()){alert("Task name cannot be empty");return}
+ tasks[i].name=n.trim();
+ save();render();
+}
+function setFilter(f,btn){
+ filter=f;
+ document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===btn));
+ render();
+}
+function setSearch(v){query=v.trim().toLowerCase();render()}
+function isOverdue(t){
+ if(t.done||!t.date)return false;
+ const today=new Date();today.setHours(0,0,0,0);
+ return new Date(t.date+"T00:00:00")<today;
+}
+function badge(p){return `<span class="badge b-${p.toLowerCase()}">${escapeHTML(p)}</span>`}
+
+// ATTENDANCE
+function validAtt(a,h){return Number.isInteger(a)&&Number.isInteger(h)&&h>0&&a>=0&&a<=h}
+function addAttendance(){
+ const name=document.getElementById("subjectName").value.trim();
+ const aRaw=document.getElementById("attended").value,hRaw=document.getElementById("held").value;
+ const a=Number(aRaw),h=Number(hRaw);
+ if(!name||aRaw===""||hRaw===""||!validAtt(a,h)){alert("Please enter valid attendance details");return}
+ attendance.push({name,a,h});
+ ["subjectName","attended","held"].forEach(id=>document.getElementById(id).value="");
+ save();render();
+}
+function editAttendance(i){
+ let a=prompt("Enter classes attended:",attendance[i].a);
+ if(a===null)return;
+ let h=prompt("Enter total classes:",attendance[i].h);
+ if(h===null)return;
+ a=Number(a);h=Number(h);
+ if(!validAtt(a,h)){alert("Please enter valid numbers. Attended classes cannot exceed total classes.");return}
+ attendance[i].a=a;attendance[i].h=h;
+ save();render();
+}
+function deleteAttendance(i){attendance.splice(i,1);save();render()}
+// classes to attend in a row to reach 75%, or classes that can be missed
+function attNote(x){
+ const p=x.a/x.h;
+ if(p<0.75){
+  const need=Math.ceil(3*x.h-4*x.a);
+  return `<div class="warn">⚠ Below 75% — attend the next ${need} class${need>1?"es":""} to recover</div>`;
+ }
+ const skip=Math.floor((4*x.a-3*x.h)/3);
+ return `<div class="ok">✓ You can miss ${skip} more class${skip===1?"":"es"} and stay at 75%</div>`;
+}
+
+// MARKS
+function addMark(){
+ const name=document.getElementById("examName").value.trim();
+ const aRaw=document.getElementById("obtained").value,mRaw=document.getElementById("maximum").value;
+ const a=Number(aRaw),m=Number(mRaw);
+ if(!name||aRaw===""||mRaw===""||!Number.isFinite(a)||!Number.isFinite(m)||m<=0||a<0||a>m){alert("Please enter valid assessment marks");return}
+ marks.push({name,a,m});
+ ["examName","obtained","maximum"].forEach(id=>document.getElementById(id).value="");
+ save();render();
+}
+function deleteMark(i){marks.splice(i,1);save();render()}
+
+// NOTES
+function saveNote(){
+ const v=document.getElementById("noteText").value.trim();
+ if(!v)return;
+ notes.unshift(v);
+ document.getElementById("noteText").value="";
+ save();render();
+}
+function deleteNote(i){notes.splice(i,1);save();render()}
+
+// DATA TOOLS
+function resetData(){
+ if(!confirm("Delete all tasks, attendance, marks and notes? This cannot be undone."))return;
+ fetch("/api/data",{method:"PUT",headers:{"Content-Type":"application/json"},body:"{}"}).catch(()=>{}).finally(()=>location.reload());
+}
+
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function render(){
+ document.getElementById("total").textContent=tasks.length;
+ document.getElementById("completed").textContent=tasks.filter(t=>t.done).length;
+ document.getElementById("pending").textContent=tasks.filter(t=>!t.done).length;
+
+ const ta=attendance.reduce((s,x)=>s+x.a,0),th=attendance.reduce((s,x)=>s+x.h,0);
+ document.getElementById("attendanceStat").textContent=(th?Math.round(ta/th*100):0)+"%";
+
+ // TASK LIST (filtered; keep original index)
+ const list=tasks.map((t,i)=>({t,i})).filter(({t})=>
+  (filter==="all"||(filter==="done"?t.done:!t.done))&&t.name.toLowerCase().includes(query));
+ document.getElementById("taskList").innerHTML=list.map(({t,i})=>`
+ <div class="item ${isOverdue(t)?"overdue":""}">
+  <div>
+   <strong class="${t.done?"done":""}">${escapeHTML(t.name)}</strong>${badge(t.priority)}${isOverdue(t)?'<span class="badge b-over">Overdue</span>':""}
+   <p>${t.date||"No due date"} · ${t.done?"Completed":"Pending"}</p>
+  </div>
+  <div>
+   <button class="edit" onclick="toggleTask(${i})">${t.done?"Undo":"Done"}</button>
+   <button class="edit" onclick="editTask(${i})">Edit</button>
+   <button class="delete" onclick="deleteTask(${i})">Delete</button>
+  </div>
+ </div>`).join("")||`<div class="empty">${tasks.length?"No tasks match your filter.":"No tasks yet. Add your first task!"}</div>`;
+
+ // UPCOMING (overdue first, then by date)
+ const upcoming=tasks.filter(t=>!t.done).sort((a,b)=>{
+  if(!a.date)return 1;if(!b.date)return -1;
+  return a.date.localeCompare(b.date);
+ }).slice(0,5);
+ document.getElementById("upcoming").innerHTML=upcoming.map(t=>`
+ <div class="item ${isOverdue(t)?"overdue":""}">
+  <div><strong>${escapeHTML(t.name)}</strong>${badge(t.priority)}${isOverdue(t)?'<span class="badge b-over">Overdue</span>':""}
+  <p>${t.date||"No due date"}</p></div>
+ </div>`).join("")||'<div class="empty">You are all caught up!</div>';
+
+ // ATTENDANCE
+ const html=attendance.map((x,i)=>{
+  const p=Math.round(x.a/x.h*100);
+  return `
+  <div class="subject ${p<75?"low":""}">
+   <div class="subject-top"><strong>${escapeHTML(x.name)}</strong><span>${p}%</span></div>
+   <div class="bar"><div class="fill" style="width:${p}%"></div></div>
+   <p style="color:var(--muted);font-size:13px;margin-top:7px">${x.a} / ${x.h} classes attended</p>
+   ${attNote(x)}
+   <div class="subject-actions">
+    <button class="edit" onclick="editAttendance(${i})">Edit</button>
+    <button class="delete" onclick="deleteAttendance(${i})">Delete</button>
+   </div>
+  </div>`;
+ }).join("")||'<div class="empty">No subjects added yet.</div>';
+ document.getElementById("attendanceList").innerHTML=html;
+ document.getElementById("dashboardAttendance").innerHTML=html;
+
+ // MARKS + SUMMARY
+ if(marks.length){
+  const pcts=marks.map(x=>x.a/x.m*100);
+  const avg=Math.round(pcts.reduce((s,v)=>s+v,0)/pcts.length);
+  const best=marks[pcts.indexOf(Math.max(...pcts))];
+  document.getElementById("marksSummary").innerHTML=
+   `<div><b>${avg}%</b>Average</div><div><b>${marks.length}</b>Assessments</div><div><b>${escapeHTML(best.name)}</b>Top score</div>`;
+ }else document.getElementById("marksSummary").innerHTML="";
+ document.getElementById("marksList").innerHTML=marks.map((x,i)=>`
+ <div class="item">
+  <div><strong>${escapeHTML(x.name)}</strong><p>${x.a}/${x.m} marks · ${Math.round(x.a/x.m*100)}%</p></div>
+  <button class="delete" onclick="deleteMark(${i})">Delete</button>
+ </div>`).join("")||'<div class="empty">No assessment marks added yet.</div>';
+
+ // NOTES
+ document.getElementById("notesList").innerHTML=notes.map((n,i)=>`
+ <div class="item"><div>${escapeHTML(n)}</div><button class="delete" onclick="deleteNote(${i})">Delete</button></div>`
+ ).join("")||'<div class="empty">No notes saved yet.</div>';
+}
+
+applyTheme();
+render();
+pull();
+</script>
+</body>
+</html>
